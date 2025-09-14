@@ -49,7 +49,7 @@ export function UserDashboard() {
             <div className="flex items-center gap-3">
               <Image src="/logo.png" width={50} height={50} alt="logo" />
               <div>
-                <h1 className="text-xl font-bold text-foreground">YIM Tarbiyat</h1>
+                <h1 className="text-xl font-bold text-foreground">YIM Tarbiyah</h1>
                 <p className="text-sm text-muted-foreground">Spiritual Journey Tracker</p>
               </div>
             </div>

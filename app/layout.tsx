@@ -9,9 +9,8 @@ import { Suspense } from "react"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "YIM Tarbiyat - Spiritual Journey Tracker",
-  description: "Track your daily spiritual journey with the YIM Tarbiyat community",
-  generator: "v0.app",
+  title: "YIM Tarbiyah - Spiritual Journey Tracker",
+  description: "Track your daily spiritual journey with the Youth Intifada Muhammadpur",
 }
 
 export default function RootLayout({

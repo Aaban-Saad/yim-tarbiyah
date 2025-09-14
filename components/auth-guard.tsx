@@ -30,7 +30,7 @@ export function AuthGuard({ children, requireAdmin = false }: AuthGuardProps) {
         <Card className="w-full max-w-md">
           <CardHeader className="text-center flex items-center flex-col">
             <Image className="rounded-2xl" src="/logo.png" width={100} height={100} alt="logo" />
-            <CardTitle className="text-2xl font-bold text-primary">YIM Tarbiyat</CardTitle>
+            <CardTitle className="text-2xl font-bold text-primary">YIM Tarbiyah</CardTitle>
             <CardDescription>Track your daily spiritual journey with the community</CardDescription>
           </CardHeader>
           <CardContent>
