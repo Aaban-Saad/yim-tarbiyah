@@ -21,11 +21,14 @@ interface DailySubmissionFormProps {
   existingSubmission?: DailySubmission | null
   onClose: () => void
   onSuccess: () => void
+  date?: string
+  newEntry: boolean
 }
 
-export function PastSubmissionForm({ existingSubmission, onClose, onSuccess }: DailySubmissionFormProps) {
-  const { submitToday, updateToday } = useTodaySubmission()
+export function PastSubmissionForm({ existingSubmission, onClose, onSuccess, date="", newEntry }: DailySubmissionFormProps) {
+  const { submit, update } = useTodaySubmission()
   const [loading, setLoading] = useState(false)
+  const [selectedDate, setSelectedDate] = useState(date)
 
   // Form state
   const [prayers, setPrayers] = useState<PrayerStatus>({
@@ -70,12 +73,12 @@ export function PastSubmissionForm({ existingSubmission, onClose, onSuccess }: D
         bookReading: existingSubmission.bookReading,
       })
       setActivityComments({
-        tilawat: existingSubmission.tilawatComment,
-        dua: existingSubmission.duaComment,
-        sadaqah: existingSubmission.sadaqahComment,
-        zikr: existingSubmission.zikrComment,
-        masnunDua: existingSubmission.masnunDuaComment,
-        bookReading: existingSubmission.bookReadingComment,
+        tilawat: existingSubmission.tilawatComment || "",
+        dua: existingSubmission.duaComment || "",
+        sadaqah: existingSubmission.sadaqahComment || "",
+        zikr: existingSubmission.zikrComment || "",
+        masnunDua: existingSubmission.masnunDuaComment || "",
+        bookReading: existingSubmission.bookReadingComment || "",
       })
       setSleepTime(existingSubmission.sleepTime)
       setComments(existingSubmission.comments)
@@ -95,8 +98,10 @@ export function PastSubmissionForm({ existingSubmission, onClose, onSuccess }: D
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
+    if(selectedDate.length === 0) return
     e.preventDefault()
     setLoading(true)
+    console.log("------------------------____>")
 
     try {
       const submissionData = {
@@ -117,14 +122,16 @@ export function PastSubmissionForm({ existingSubmission, onClose, onSuccess }: D
         comments,
       }
 
+      console.log(submissionData)
+
       if (existingSubmission) {
-        await updateToday(submissionData)
+        await update(submissionData, selectedDate)
         toast({
           title: "Updated successfully",
           description: "Your daily amal has been updated.",
         })
       } else {
-        await submitToday(submissionData)
+        await submit(submissionData, selectedDate)
         toast({
           title: "Submitted successfully",
           description: "Your daily amal has been recorded.",
@@ -197,12 +204,22 @@ export function PastSubmissionForm({ existingSubmission, onClose, onSuccess }: D
             {existingSubmission ? "Edit Amal" : "Submit Amal"}
           </DialogTitle>
           <DialogDescription className="text-start">
-            {new Date(existingSubmission?.date || "").toLocaleDateString("en-US", {
-              weekday: "long",
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
+            {newEntry ?
+              <Input
+                type="date"
+                value={selectedDate}
+                onChange={(e) => {
+                  setSelectedDate(e.target.value)
+                }}
+              />
+              :
+              (new Date(existingSubmission?.date || "").toLocaleDateString("en-US", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              }))
+            }
           </DialogDescription>
         </DialogHeader>
 
@@ -259,8 +276,8 @@ export function PastSubmissionForm({ existingSubmission, onClose, onSuccess }: D
             </CardHeader>
             <CardContent className="space-y-4">
               {Object.entries(activityNames).map(([activity, name]) => (
-                <div className="flex flex-col items-start gap-2 border-t-2">
-                  <div key={activity} className="flex items-center space-x-2 mt-3">
+                <div key={activity} className="flex flex-col items-start gap-2 border-t-2">
+                  <div className="flex items-center space-x-2 mt-3">
                     <Checkbox
                       id={activity}
                       checked={activities[activity as keyof typeof activities]}
@@ -347,7 +364,7 @@ export function PastSubmissionForm({ existingSubmission, onClose, onSuccess }: D
 
           {/* Form Actions */}
           <div className="flex flex-col md:flex-row gap-3 pt-4">
-            <Button type="submit" disabled={loading} className="flex-1">
+            <Button type="submit" disabled={loading || selectedDate.length === 0} className="flex-1">
               {loading ? (
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground mr-2"></div>
               ) : (

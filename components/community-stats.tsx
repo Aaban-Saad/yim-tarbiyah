@@ -50,27 +50,27 @@ export function CommunityStats({ submissions, users }: CommunityStatsProps) {
 
     // Prayer statistics - completion rates for each prayer
     const prayerCounts = {
-      fajr: { completed: 0, masbuq: 0, missed: 0 },
-      zuhr: { completed: 0, masbuq: 0, missed: 0 },
-      asr: { completed: 0, masbuq: 0, missed: 0 },
-      maghrib: { completed: 0, masbuq: 0, missed: 0 },
-      isha: { completed: 0, masbuq: 0, missed: 0 },
+      fajr: { completed: 0, masbuq: 0, munfarid: 0 },
+      zuhr: { completed: 0, masbuq: 0, munfarid: 0 },
+      asr: { completed: 0, masbuq: 0, munfarid: 0 },
+      maghrib: { completed: 0, masbuq: 0, munfarid: 0 },
+      isha: { completed: 0, masbuq: 0, munfarid: 0 },
     }
 
     submissions.forEach((submission) => {
       Object.entries(submission.prayers).forEach(([prayer, status]) => {
         // Assert that status is a valid key of the inner object
-        prayerCounts[prayer as keyof typeof prayerCounts][status as 'completed' | 'masbuq' | 'missed']++
+        prayerCounts[prayer as keyof typeof prayerCounts][status as 'completed' | 'masbuq' | 'munfarid']++
       })
     })
 
     const prayerStats = Object.entries(prayerCounts).map(([prayer, counts]) => {
-      const total = counts.completed + counts.masbuq + counts.missed
+      const total = counts.completed + counts.masbuq + counts.munfarid
       return {
         prayer: prayer.charAt(0).toUpperCase() + prayer.slice(1),
         completed: total ? Math.round((counts.completed / total) * 100) : 0,
         masbuq: total ? Math.round((counts.masbuq / total) * 100) : 0,
-        missed: total ? Math.round((counts.missed / total) * 100) : 0,
+        munfarid: total ? Math.round((counts.munfarid / total) * 100) : 0,
       }
     })
 
@@ -197,8 +197,8 @@ export function CommunityStats({ submissions, users }: CommunityStatsProps) {
                 label: "Masbuq",
                 color: "orange",
               },
-              missed: {
-                label: "Missed",
+              munfarid: {
+                label: "Munfarid",
                 color: "red",
               },
             }}
@@ -213,7 +213,7 @@ export function CommunityStats({ submissions, users }: CommunityStatsProps) {
                 <Legend />
                 <Bar dataKey="completed" stackId="a" fill="var(--color-completed)" name="Completed" />
                 <Bar dataKey="masbuq" stackId="a" fill="var(--color-masbuq)" name="Masbuq" />
-                <Bar dataKey="missed" stackId="a" fill="var(--color-missed)" name="Missed" />
+                <Bar dataKey="munfarid" stackId="a" fill="var(--color-munfarid)" name="Munfarid" />
               </BarChart>
             </ResponsiveContainer>
           </ChartContainer>

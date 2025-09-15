@@ -15,8 +15,13 @@ interface SubmissionHistoryProps {
 }
 
 export function SubmissionHistory({ submissions, loading }: SubmissionHistoryProps) {
-  const [sumbissionIndex, setSubmissionsIndex] = useState<number>(0)
+  const [submissionIndex, setSubmissionsIndex] = useState<number>(0)
   const [showSubmissionForm, setShowSubmissionForm] = useState<boolean>(false)
+  const [showNewPastSubmissionForm, setShowNewPastSubmissionForm] = useState<boolean>(false)
+
+  const handleNewPastSubmit = () => {
+    setShowNewPastSubmissionForm(true)
+  }
 
   if (loading) {
     return (
@@ -60,6 +65,7 @@ export function SubmissionHistory({ submissions, loading }: SubmissionHistoryPro
       <CardHeader>
         <CardTitle>Submission History</CardTitle>
         <CardDescription>Your daily spiritual journey records</CardDescription>
+        <Button className="w-fit" variant={'link'} onClick={handleNewPastSubmit}>Submit Past Amal</Button>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
@@ -174,12 +180,26 @@ export function SubmissionHistory({ submissions, loading }: SubmissionHistoryPro
 
       {showSubmissionForm && (
         <PastSubmissionForm
-          existingSubmission={submissions[sumbissionIndex]}
+          existingSubmission={submissions[submissionIndex]}
           onClose={() => setShowSubmissionForm(false)}
           onSuccess={() => {
             setShowSubmissionForm(false)
             // Refresh data would happen automatically via hooks
           }}
+          date = {submissions[submissionIndex].date}
+          newEntry = {false}
+        />
+      )}
+
+      {showNewPastSubmissionForm && (
+        <PastSubmissionForm
+          onClose={() => {
+            setShowNewPastSubmissionForm(false)
+          }}
+          onSuccess={() => {
+            setShowNewPastSubmissionForm(false)
+          }}
+          newEntry = {true}
         />
       )}
 

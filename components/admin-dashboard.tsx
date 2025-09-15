@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useAuth } from "@/lib/auth-context"
-import { getAllSubmissions, getAllUsers, getSubmissionsByDate, calculateCompletionRate } from "@/lib/firestore"
+import { getAllSubmissions, getAllUsers, getSubmissionsByDate, calculateCompletionRate, getSubmissionsByDateRange } from "@/lib/firestore"
 import type { DailySubmission, UserProfile } from "@/lib/types"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -23,7 +23,8 @@ export function AdminDashboard() {
   const [submissions, setSubmissions] = useState<DailySubmission[]>([])
   const [users, setUsers] = useState<UserProfile[]>([])
   const [loading, setLoading] = useState(true)
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0])
+  const [selectedStartDate, setSelectedStartDate] = useState("")
+  const [selectedEndDate, setSelectedEndDate] = useState("")
   const [searchTerm, setSearchTerm] = useState("")
 
   useEffect(() => {
@@ -43,10 +44,11 @@ export function AdminDashboard() {
     fetchData()
   }, [])
 
-  const handleDateFilter = async (date: string) => {
-    setSelectedDate(date)
+  const handleDateFilter = async (startDate = new Date().toISOString().split("T")[0], endDate = new Date().toISOString().split("T")[0]) => {
+    setSelectedStartDate(startDate)
+    setSelectedEndDate(endDate)
     try {
-      const dateSubmissions = await getSubmissionsByDate(date)
+      const dateSubmissions = await getSubmissionsByDateRange(startDate, endDate)
       setSubmissions(dateSubmissions)
     } catch (error) {
       console.error("Error filtering by date:", error)
@@ -55,9 +57,10 @@ export function AdminDashboard() {
 
   const handleShowAll = async () => {
     try {
-      const allSubmissions = await getAllSubmissions(200)
+      const allSubmissions = await getAllSubmissions(500)
       setSubmissions(allSubmissions)
-      setSelectedDate("")
+      setSelectedStartDate("")
+      setSelectedEndDate("")
     } catch (error) {
       console.error("Error fetching all submissions:", error)
     }
@@ -211,12 +214,21 @@ export function AdminDashboard() {
                   </div>
                   <div className="flex flex-col md:flex-row gap-2">
                     <div>
-                      <Label htmlFor="date">Filter by date</Label>
+                      <Label htmlFor="date">Start Date</Label>
                       <Input
                         id="date"
                         type="date"
-                        value={selectedDate}
-                        onChange={(e) => handleDateFilter(e.target.value)}
+                        value={selectedStartDate}
+                        onChange={(e) => handleDateFilter(e.target.value, selectedEndDate)}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="date2">End Date</Label>
+                      <Input
+                        id="date2"
+                        type="date"
+                        value={selectedEndDate}
+                        onChange={(e) => handleDateFilter(selectedStartDate, e.target.value)} 
                       />
                     </div>
                     <div className="flex items-end">

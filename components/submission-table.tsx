@@ -5,7 +5,7 @@ import type { DailySubmission, UserProfile } from "@/lib/types"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { CheckCircle, XCircle, Clock, Eye } from "lucide-react"
+import { CheckCircle, XCircle, Clock, Eye, Hourglass } from "lucide-react"
 import { useState } from "react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
@@ -29,7 +29,7 @@ export function SubmissionTable({ submissions, users }: SubmissionTableProps) {
       case "masbuq":
         return <Clock className="h-4 w-4 text-yellow-600" />
       default:
-        return <XCircle className="h-4 w-4 text-red-600" />
+        return <Hourglass className="h-4 w-4 text-red-600" />
     }
   }
 
@@ -171,54 +171,84 @@ export function SubmissionTable({ submissions, users }: SubmissionTableProps) {
               {/* Activities */}
               <div>
                 <h4 className="font-medium mb-2">Spiritual Activities</h4>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="flex items-center gap-2">
+                <div className="flex flex-col">
+                  <div className="flex  items-center gap-2">
                     {selectedSubmission.tilawat ? (
-                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      <CheckCircle className="shrink-0 h-4 w-4 text-green-600" />
                     ) : (
-                      <XCircle className="h-4 w-4 text-red-600" />
+                      <XCircle className="shrink-0 h-4 w-4 text-red-600" />
                     )}
-                    <span className="text-sm">Quran Recitation</span>
+                    <p className="text-sm font-bold">
+                      Quran Recitation:&nbsp;
+                      <span className="font-medium">
+                        {selectedSubmission.tilawatComment}
+                      </span>
+                    </p>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex  items-center gap-2">
                     {selectedSubmission.dua ? (
-                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      <CheckCircle className="shrink-0 h-4 w-4 text-green-600" />
                     ) : (
-                      <XCircle className="h-4 w-4 text-red-600" />
+                      <XCircle className="shrink-0 h-4 w-4 text-red-600" />
                     )}
-                    <span className="text-sm">Supplication</span>
+                    <p className="text-sm font-bold">
+                      Dua:&nbsp;
+                      <span className="font-medium">
+                        {selectedSubmission.duaComment}
+                      </span>
+                    </p>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex  items-center gap-2">
                     {selectedSubmission.sadaqah ? (
-                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      <CheckCircle className="shrink-0 h-4 w-4 text-green-600" />
                     ) : (
-                      <XCircle className="h-4 w-4 text-red-600" />
+                      <XCircle className="shrink-0 h-4 w-4 text-red-600" />
                     )}
-                    <span className="text-sm">Charity</span>
+                    <p className="text-sm font-bold">
+                      Sadaqah:&nbsp;
+                      <span className="font-medium">
+                        {selectedSubmission.sadaqahComment}
+                      </span>
+                    </p>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex  items-center gap-2">
                     {selectedSubmission.zikr ? (
-                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      <CheckCircle className="shrink-0 h-4 w-4 text-green-600" />
                     ) : (
-                      <XCircle className="h-4 w-4 text-red-600" />
+                      <XCircle className="shrink-0 h-4 w-4 text-red-600" />
                     )}
-                    <span className="text-sm">Dhikr</span>
+                    <p className="text-sm font-bold">
+                      Zirk:&nbsp;
+                      <span className="font-medium">
+                        {selectedSubmission.zikrComment}
+                      </span>
+                    </p>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex  items-center gap-2">
                     {selectedSubmission.masnunDua ? (
-                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      <CheckCircle className="shrink-0 h-4 w-4 text-green-600" />
                     ) : (
-                      <XCircle className="h-4 w-4 text-red-600" />
+                      <XCircle className="shrink-0 h-4 w-4 text-red-600" />
                     )}
-                    <span className="text-sm">Sunnah Prayers</span>
+                    <p className="text-sm font-bold">
+                      Masnun Dua:&nbsp;
+                      <span className="font-medium">
+                        {selectedSubmission.masnunDuaComment}
+                      </span>
+                    </p>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex  items-center gap-2">
                     {selectedSubmission.bookReading ? (
-                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      <CheckCircle className="shrink-0 h-4 w-4 text-green-600" />
                     ) : (
-                      <XCircle className="h-4 w-4 text-red-600" />
+                      <XCircle className="shrink-0 h-4 w-4 text-red-600" />
                     )}
-                    <span className="text-sm">Book Reading</span>
+                    <p className="text-sm font-bold">
+                      Book Reading:&nbsp;
+                      <span className="font-medium">
+                        {selectedSubmission.bookReadingComment}
+                      </span>
+                    </p>
                   </div>
                 </div>
               </div>

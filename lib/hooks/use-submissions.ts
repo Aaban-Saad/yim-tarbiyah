@@ -5,13 +5,13 @@ import { useAuth } from "@/lib/auth-context"
 import {
   getUserSubmissions,
   getSubmissionByDate,
-  submitDailyAmal,
+  submitAmal,
   updateDailySubmission,
   getTodayDate,
 } from "@/lib/firestore"
 import type { DailySubmission } from "@/lib/types"
 
-export function useUserSubmissions(limit = 30) {
+export function useUserSubmissions(limit = 50) {
   const { user } = useAuth()
   const [submissions, setSubmissions] = useState<DailySubmission[]>([])
   const [loading, setLoading] = useState(true)
@@ -65,7 +65,6 @@ export function useTodaySubmission() {
       setLoading(false)
       return
     }
-
     const fetchTodaySubmission = async () => {
       try {
         setLoading(true)
@@ -80,57 +79,108 @@ export function useTodaySubmission() {
       }
     }
 
+
     fetchTodaySubmission()
   }, [user])
 
-  const submitToday = async (
+  // const submitToday = async (
+  //   submissionData: Omit<DailySubmission, "id" | "userId" | "date" | "createdAt" | "updatedAt">,
+  // ) => {
+  //   if (!user) throw new Error("User not authenticated")
+
+  //   try {
+  //     const submissionId = await submitDailyAmal({
+  //       ...submissionData,
+  //       userId: user.uid,
+  //       date: getTodayDate(),
+  //     })
+
+  //     const newSubmission: DailySubmission = {
+  //       id: submissionId,
+  //       ...submissionData,
+  //       userId: user.uid,
+  //       date: getTodayDate(),
+  //       createdAt: new Date(),
+  //       updatedAt: new Date(),
+  //     }
+
+  //     setSubmission(newSubmission)
+  //     return submissionId
+  //   } catch (err) {
+  //     setError("Failed to submit daily amal")
+  //     throw err
+  //   }
+  // }
+
+  // const updateToday = async (updates: Partial<DailySubmission>) => {
+  //   if (!user || !submission?.id) throw new Error("No submission to update")
+
+  //   try {
+  //     await updateDailySubmission(submission.id, updates)
+  //     setSubmission((prev) => (prev ? { ...prev, ...updates, updatedAt: new Date() } : null))
+  //   } catch (err) {
+  //     setError("Failed to update submission")
+  //     console.log(err)
+  //     throw err
+  //   }
+  // }
+
+  const submit = async (
     submissionData: Omit<DailySubmission, "id" | "userId" | "date" | "createdAt" | "updatedAt">,
+    date: string // Or Date object, depending on your getFormattedDate function
   ) => {
-    if (!user) throw new Error("User not authenticated")
+    if (!user) throw new Error("User not authenticated");
 
     try {
-      const submissionId = await submitDailyAmal({
+      const submissionId = await submitAmal({
         ...submissionData,
         userId: user.uid,
-        date: getTodayDate(),
-      })
+        date,
+      });
 
       const newSubmission: DailySubmission = {
         id: submissionId,
         ...submissionData,
         userId: user.uid,
-        date: getTodayDate(),
+        date,
         createdAt: new Date(),
         updatedAt: new Date(),
-      }
+      };
 
-      setSubmission(newSubmission)
-      return submissionId
+      setSubmission(newSubmission); // This might need to be adjusted if you're not always setting the "current" submission
+      return submissionId;
     } catch (err) {
-      setError("Failed to submit daily amal")
-      throw err
+      setError("Failed to submit daily amal");
+      throw err;
     }
-  }
+  };
 
-  const updateToday = async (updates: Partial<DailySubmission>) => {
-    if (!user || !submission?.id) throw new Error("No submission to update")
+  const update = async ( submissionData: Omit<DailySubmission, "id" | "userId" | "date" | "createdAt" | "updatedAt">,
+    date: string) => {
+    if (!user) throw new Error("No submission to update");
 
     try {
-      await updateDailySubmission(submission.id, updates)
-      setSubmission((prev) => (prev ? { ...prev, ...updates, updatedAt: new Date() } : null))
+      
+      const currentSubmission = await getSubmissionByDate(user.uid, date) as DailySubmission
+      const submissionId = currentSubmission?.id || ""
+
+      await updateDailySubmission(submissionId , submissionData);
+      // You'll need a way to find and update the correct submission in your state if it's not the "current" one
+      setSubmission((prev) => (prev && prev.id === submissionId ? { ...prev, ...submissionData, updatedAt: new Date() } : prev));
     } catch (err) {
-      setError("Failed to update submission")
-      console.log(err)
-      throw err
+      setError("Failed to update submission");
+      console.log(err);
+      throw err;
     }
-  }
+  };
+  
 
   return {
     submission,
     loading,
     error,
-    submitToday,
-    updateToday,
+    submit,
+    update,
     hasSubmittedToday: !!submission,
   }
 }

@@ -24,7 +24,7 @@ interface DailySubmissionFormProps {
 }
 
 export function DailySubmissionForm({ existingSubmission, onClose, onSuccess }: DailySubmissionFormProps) {
-  const { submitToday, updateToday } = useTodaySubmission()
+  const { submit, update } = useTodaySubmission()
   const [loading, setLoading] = useState(false)
 
   // Form state
@@ -118,13 +118,13 @@ export function DailySubmissionForm({ existingSubmission, onClose, onSuccess }: 
       }
 
       if (existingSubmission) {
-        await updateToday(submissionData)
+        await update(submissionData, new Date().toISOString().split("T")[0])
         toast({
           title: "Updated successfully",
           description: "Your daily amal has been updated.",
         })
       } else {
-        await submitToday(submissionData)
+        await submit(submissionData, new Date().toISOString().split("T")[0])
         toast({
           title: "Submitted successfully",
           description: "Your daily amal has been recorded.",

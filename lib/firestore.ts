@@ -46,8 +46,8 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
 }
 
 // Daily Submission Operations
-export async function submitDailyAmal(
-  submission: Omit<DailySubmission, "id" | "createdAt" | "updatedAt">,
+export async function submitAmal(
+  submission: Omit<DailySubmission, "id" | "createdAt" | "updatedAt">
 ): Promise<string> {
   const submissionData = {
     ...submission,
@@ -134,6 +134,7 @@ export async function getAllSubmissions(limitCount = 100): Promise<DailySubmissi
 export async function getSubmissionsByDate(date: string): Promise<DailySubmission[]> {
   const q = query(collection(db, SUBMISSIONS_COLLECTION), where("date", "==", date), orderBy("createdAt", "desc"))
 
+  console.log("dasf, ",date)
   const querySnapshot = await getDocs(q)
   return querySnapshot.docs.map((doc) => ({
     id: doc.id,
@@ -141,6 +142,31 @@ export async function getSubmissionsByDate(date: string): Promise<DailySubmissio
     createdAt: doc.data().createdAt?.toDate(),
     updatedAt: doc.data().updatedAt?.toDate(),
   })) as DailySubmission[]
+}
+
+export async function getSubmissionsByDateRange(startDate: string, endDate: string): Promise<DailySubmission[]> {
+  // Create a query that orders by the "date" field and filters within the specified range.
+  // The 'date' field in the document should be a string in a sortable format like "YYYY-MM-DD".
+  const q = query(
+    collection(db, SUBMISSIONS_COLLECTION),
+    orderBy("date"), // Order by the date string for range queries
+    where("date", ">=", startDate),
+    where("date", "<=", endDate)
+  );
+
+  console.log(`Searching for submissions from ${startDate} to ${endDate}`);
+  const querySnapshot = await getDocs(q);
+
+  return querySnapshot.docs.map((doc) => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      ...data,
+      // Convert Firebase Timestamps to JavaScript Date objects
+      createdAt: (data.createdAt as Timestamp)?.toDate(),
+      updatedAt: (data.updatedAt as Timestamp)?.toDate(),
+    } as DailySubmission;
+  });
 }
 
 export async function getAllUsers(): Promise<UserProfile[]> {
