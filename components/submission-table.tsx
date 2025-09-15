@@ -108,9 +108,9 @@ export function SubmissionTable({ submissions, users }: SubmissionTableProps) {
                       Sadaqah
                     </Badge>
                   )}
-                  {submission.zikr && (
+                  {submission.dhikr && (
                     <Badge variant="secondary" className="text-xs">
-                      Zikr
+                      Dhikr
                     </Badge>
                   )}
                   {submission.masnunDua && (
@@ -212,15 +212,15 @@ export function SubmissionTable({ submissions, users }: SubmissionTableProps) {
                     </p>
                   </div>
                   <div className="flex  items-center gap-2">
-                    {selectedSubmission.zikr ? (
+                    {selectedSubmission.dhikr ? (
                       <CheckCircle className="shrink-0 h-4 w-4 text-green-600" />
                     ) : (
                       <XCircle className="shrink-0 h-4 w-4 text-red-600" />
                     )}
                     <p className="text-sm font-bold">
-                      Zirk:&nbsp;
+                      Dhikr:&nbsp;
                       <span className="font-medium">
-                        {selectedSubmission.zikrComment}
+                        {selectedSubmission.dhikrComment}
                       </span>
                     </p>
                   </div>

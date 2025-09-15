@@ -141,10 +141,10 @@ export function SubmissionHistory({ submissions, loading }: SubmissionHistoryPro
                     <p>{submission.sadaqahComment}</p>
                   </div>
                   <div className="flex gap-2">
-                    <Badge variant={submission.zikr ? "default" : "destructive"} className="text-xs w-22">
-                      Zirk
+                    <Badge variant={submission.dhikr ? "default" : "destructive"} className="text-xs w-22">
+                      Dhikr
                     </Badge>
-                    <p>{submission.zikrComment}</p>
+                    <p>{submission.dhikrComment}</p>
                   </div>
                   <div className="flex gap-2">
                     <Badge variant={submission.masnunDua ? "default" : "destructive"} className="text-xs w-22">

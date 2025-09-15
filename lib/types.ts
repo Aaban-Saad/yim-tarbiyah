@@ -17,8 +17,8 @@ export interface DailySubmission {
   duaComment:string
   sadaqah: boolean // Charity
   sadaqahComment: string
-  zikr: boolean // Dhikr/Remembrance
-  zikrComment: string
+  dhikr: boolean // Dhikr/Remembrance
+  dhikrComment: string
   masnunDua: boolean // Sunnah prayers
   masnunDuaComment: string
   bookReading: boolean // Book reading (assigned portion)
