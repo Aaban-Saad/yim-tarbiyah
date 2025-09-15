@@ -15,12 +15,14 @@ import { SubmissionHistory } from "@/components/submission-history"
 import { Calendar, CheckCircle, Clock, TrendingUp, User, LogOut } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import { PastSubmissionForm } from "./past-submission-form"
 
 export function UserDashboard() {
   const { user, logout, isAdmin } = useAuth()
   const { submission: todaySubmission, hasSubmittedToday, loading: todayLoading } = useTodaySubmission()
   const { submissions, loading: historyLoading } = useUserSubmissions()
   const [showSubmissionForm, setShowSubmissionForm] = useState(false)
+  const [showNewPastSubmissionForm, setShowNewPastSubmissionForm] = useState<boolean>(false)
 
   const todayCompletionRate = todaySubmission ? calculateCompletionRate(todaySubmission) : 0
 
@@ -128,6 +130,7 @@ export function UserDashboard() {
                     </Button>
                   )}
                 </div>
+                <Button className="w-fit px-2" variant={'link'} onClick={() => setShowNewPastSubmissionForm(true)}>Submit Previous Amal</Button>
               </div>
             </CardContent>
           </Card>
@@ -229,9 +232,21 @@ export function UserDashboard() {
           />
         )}
 
+        {showNewPastSubmissionForm && (
+          <PastSubmissionForm
+            onClose={() => {
+              setShowNewPastSubmissionForm(false)
+            }}
+            onSuccess={() => {
+              setShowNewPastSubmissionForm(false)
+            }}
+            newEntry={true}
+          />
+        )}
+
         {/* Admin Link */}
         {isAdmin && (
-          <div className="fixed bottom-6 right-6">
+          <div className="fixed bottom-6 right-6 z-50">
             <Button asChild className="shadow-lg">
               <a href="/admin">Admin Dashboard</a>
             </Button>

@@ -19,10 +19,6 @@ export function SubmissionHistory({ submissions, loading }: SubmissionHistoryPro
   const [showSubmissionForm, setShowSubmissionForm] = useState<boolean>(false)
   const [showNewPastSubmissionForm, setShowNewPastSubmissionForm] = useState<boolean>(false)
 
-  const handleNewPastSubmit = () => {
-    setShowNewPastSubmissionForm(true)
-  }
-
   if (loading) {
     return (
       <Card>
@@ -65,7 +61,7 @@ export function SubmissionHistory({ submissions, loading }: SubmissionHistoryPro
       <CardHeader>
         <CardTitle>Submission History</CardTitle>
         <CardDescription>Your daily spiritual journey records</CardDescription>
-        <Button className="w-fit" variant={'link'} onClick={handleNewPastSubmit}>Submit Past Amal</Button>
+        <Button className="w-fit" variant={'link'} onClick={() => setShowNewPastSubmissionForm(true)}>Submit Previous Amal</Button>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
