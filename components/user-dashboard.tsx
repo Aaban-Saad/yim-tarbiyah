@@ -186,15 +186,18 @@ export function UserDashboard() {
                   </div>
                 ) : submissions.length > 0 ? (
                   <div className="space-y-3">
-                    {submissions.slice(0, 7).map((submission) => (
-                      <div key={submission.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                        <div>
-                          <p className="font-medium">{new Date(submission.date).toLocaleDateString()}</p>
-                          <p className="text-sm text-muted-foreground">{submission.comments || "No comments"}</p>
+                    {submissions
+                      .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                      .slice(0, 7)
+                      .map((submission) => (
+                        <div key={submission.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                          <div>
+                            <p className="font-medium">{new Date(submission.date).toLocaleDateString()}</p>
+                            <p className="text-sm text-muted-foreground">{submission.comments || "No comments"}</p>
+                          </div>
+                          <Badge variant="outline">{calculateCompletionRate(submission)}%</Badge>
                         </div>
-                        <Badge variant="outline">{calculateCompletionRate(submission)}%</Badge>
-                      </div>
-                    ))}
+                      ))}
                   </div>
                 ) : (
                   <p className="text-center text-muted-foreground py-8">

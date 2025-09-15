@@ -4,7 +4,10 @@ import { calculateCompletionRate } from "@/lib/firestore"
 import type { DailySubmission } from "@/lib/types"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { CheckCircle, XCircle, Clock } from "lucide-react"
+import { CheckCircle, XCircle, Clock, Hourglass } from "lucide-react"
+import { Button } from "./ui/button"
+import { useState } from "react"
+import { PastSubmissionForm } from "./past-submission-form"
 
 interface SubmissionHistoryProps {
   submissions: DailySubmission[]
@@ -12,6 +15,9 @@ interface SubmissionHistoryProps {
 }
 
 export function SubmissionHistory({ submissions, loading }: SubmissionHistoryProps) {
+  const [sumbissionIndex, setSubmissionsIndex] = useState<number>(0)
+  const [showSubmissionForm, setShowSubmissionForm] = useState<boolean>(false)
+
   if (loading) {
     return (
       <Card>
@@ -45,7 +51,7 @@ export function SubmissionHistory({ submissions, loading }: SubmissionHistoryPro
       case "masbuq":
         return <Clock className="h-4 w-4 text-yellow-600" />
       default:
-        return <XCircle className="h-4 w-4 text-red-600" />
+        return <Hourglass className="h-4 w-4 text-red-600" />
     }
   }
 
@@ -57,7 +63,7 @@ export function SubmissionHistory({ submissions, loading }: SubmissionHistoryPro
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {submissions.map((submission) => (
+          {submissions.map((submission, index) => (
             <div key={submission.id} className="border border-border rounded-lg p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <div>
@@ -71,56 +77,85 @@ export function SubmissionHistory({ submissions, loading }: SubmissionHistoryPro
                   </h3>
                   <p className="text-sm text-muted-foreground">Sleep time: {submission.sleepTime}</p>
                 </div>
-                <Badge variant="outline">{calculateCompletionRate(submission)}% Complete</Badge>
+                <div className="flex flex-col md:flex-row gap-2">
+                  <Button className="hover:cursor-pointer" variant={'secondary'} onClick={() => {
+                    setSubmissionsIndex(index)
+                    setShowSubmissionForm(true)
+                  }}>Edit</Button>
+                  <Badge variant="outline">{calculateCompletionRate(submission)}% Complete</Badge>
+                </div>
               </div>
 
               {/* Prayer Status */}
               <div>
                 <h4 className="text-sm font-medium mb-2">Prayer Status</h4>
                 <div className="grid grid-cols-5 gap-2">
-                  {Object.entries(submission.prayers).map(([prayer, status]) => (
-                    <div key={prayer} className="flex items-center gap-1">
-                      {getPrayerIcon(status)}
-                      <span className="text-xs capitalize">{prayer}</span>
-                    </div>
-                  ))}
+
+                  <div className="flex flex-col items-center gap-1">
+                    {getPrayerIcon(submission.prayers.fajr)}
+                    <span className="text-xs md:text-sm capitalize">Fajr</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    {getPrayerIcon(submission.prayers.zuhr)}
+                    <span className="text-xs md:text-sm capitalize">Zuhr</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    {getPrayerIcon(submission.prayers.asr)}
+                    <span className="text-xs md:text-sm capitalize">Asr</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    {getPrayerIcon(submission.prayers.maghrib)}
+                    <span className="text-xs md:text-sm capitalize">Maghrib</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    {getPrayerIcon(submission.prayers.isha)}
+                    <span className="text-xs md:text-sm capitalize">Isha</span>
+                  </div>
                 </div>
               </div>
 
               {/* Other Activities */}
               <div>
                 <h4 className="text-sm font-medium mb-2">Other Activities</h4>
-                <div className="flex flex-wrap gap-2">
-                  {submission.tilawat && (
-                    <Badge variant="secondary" className="text-xs">
+                <div className="flex flex-col gap-2">
+                  <div className="flex gap-2">
+                    <Badge variant={submission.tilawat ? "default" : "destructive"} className="text-xs w-22">
                       Tilawat
                     </Badge>
-                  )}
-                  {submission.dua && (
-                    <Badge variant="secondary" className="text-xs">
+                    <p>{submission.tilawatComment}</p>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Badge variant={submission.dua ? "default" : "destructive"} className="text-xs w-22">
                       Dua
                     </Badge>
-                  )}
-                  {submission.sadaqah && (
-                    <Badge variant="secondary" className="text-xs">
+                    <p>{submission.duaComment}</p>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Badge variant={submission.sadaqah ? "default" : "destructive"} className="text-xs w-22">
                       Sadaqah
                     </Badge>
-                  )}
-                  {submission.zikr && (
-                    <Badge variant="secondary" className="text-xs">
-                      Zikr
+                    <p>{submission.sadaqahComment}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Badge variant={submission.zikr ? "default" : "destructive"} className="text-xs w-22">
+                      Zirk
                     </Badge>
-                  )}
-                  {submission.masnunDua && (
-                    <Badge variant="secondary" className="text-xs">
+                    <p>{submission.zikrComment}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Badge variant={submission.masnunDua ? "default" : "destructive"} className="text-xs w-22">
                       Masnun Dua
                     </Badge>
-                  )}
-                  {submission.bookReading && (
-                    <Badge variant="secondary" className="text-xs">
+                    <p>{submission.masnunDuaComment}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Badge variant={submission.bookReading ? "default" : "destructive"} className="text-xs w-22">
                       Book Reading
                     </Badge>
-                  )}
+                    <p>{submission.bookReadingComment}</p>
+                  </div>
                 </div>
               </div>
 
@@ -135,6 +170,19 @@ export function SubmissionHistory({ submissions, loading }: SubmissionHistoryPro
           ))}
         </div>
       </CardContent>
+
+
+      {showSubmissionForm && (
+        <PastSubmissionForm
+          existingSubmission={submissions[sumbissionIndex]}
+          onClose={() => setShowSubmissionForm(false)}
+          onSuccess={() => {
+            setShowSubmissionForm(false)
+            // Refresh data would happen automatically via hooks
+          }}
+        />
+      )}
+
     </Card>
   )
 }

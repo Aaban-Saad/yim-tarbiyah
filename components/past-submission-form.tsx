@@ -23,7 +23,7 @@ interface DailySubmissionFormProps {
   onSuccess: () => void
 }
 
-export function DailySubmissionForm({ existingSubmission, onClose, onSuccess }: DailySubmissionFormProps) {
+export function PastSubmissionForm({ existingSubmission, onClose, onSuccess }: DailySubmissionFormProps) {
   const { submitToday, updateToday } = useTodaySubmission()
   const [loading, setLoading] = useState(false)
 
@@ -194,10 +194,10 @@ export function DailySubmissionForm({ existingSubmission, onClose, onSuccess }: 
             <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
               <span className="text-primary-foreground font-bold text-xs">YT</span>
             </div>
-            {existingSubmission ? "Edit Today's Amal" : "Submit Today's Amal"}
+            {existingSubmission ? "Edit Amal" : "Submit Amal"}
           </DialogTitle>
           <DialogDescription className="text-start">
-            {new Date().toLocaleDateString("en-US", {
+            {new Date(existingSubmission?.date || "").toLocaleDateString("en-US", {
               weekday: "long",
               year: "numeric",
               month: "long",

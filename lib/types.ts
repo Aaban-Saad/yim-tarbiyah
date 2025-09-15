@@ -1,9 +1,9 @@
 export interface PrayerStatus {
-  fajr: "completed" | "missed" | "masbuq"
-  zuhr: "completed" | "missed" | "masbuq"
-  asr: "completed" | "missed" | "masbuq"
-  maghrib: "completed" | "missed" | "masbuq"
-  isha: "completed" | "missed" | "masbuq"
+  fajr: "completed" | "munfarid" | "masbuq"
+  zuhr: "completed" | "munfarid" | "masbuq"
+  asr: "completed" | "munfarid" | "masbuq"
+  maghrib: "completed" | "munfarid" | "masbuq"
+  isha: "completed" | "munfarid" | "masbuq"
 }
 
 export interface DailySubmission {
@@ -12,11 +12,17 @@ export interface DailySubmission {
   date: string // YYYY-MM-DD format
   prayers: PrayerStatus
   tilawat: boolean // Quran recitation
+  tilawatComment: string
   dua: boolean // Supplication
+  duaComment:string
   sadaqah: boolean // Charity
+  sadaqahComment: string
   zikr: boolean // Dhikr/Remembrance
+  zikrComment: string
   masnunDua: boolean // Sunnah prayers
+  masnunDuaComment: string
   bookReading: boolean // Book reading (assigned portion)
+  bookReadingComment: string
   sleepTime: string // e.g., "10 PM"
   comments: string
   createdAt: Date
