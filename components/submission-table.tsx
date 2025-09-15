@@ -81,14 +81,28 @@ export function SubmissionTable({ submissions, users }: SubmissionTableProps) {
                 </div>
 
                 {/* Prayer Status Summary */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 md:gap-5">
                   <span className="text-sm font-medium">Prayers:</span>
-                  {Object.entries(submission.prayers).map(([prayer, status]) => (
-                    <div key={prayer} className="flex flex-col md:flex-row items-center gap-1">
-                      {getPrayerIcon(status)}
-                      <span className="text-xs capitalize">{prayer}</span>
-                    </div>
-                  ))}
+                  <div className="flex flex-col items-center gap-1">
+                    {getPrayerIcon(submission.prayers.fajr)}
+                    <span className="text-xs md:text-sm capitalize">Fajr</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    {getPrayerIcon(submission.prayers.zuhr)}
+                    <span className="text-xs md:text-sm capitalize">Zuhr</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    {getPrayerIcon(submission.prayers.asr)}
+                    <span className="text-xs md:text-sm capitalize">Asr</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    {getPrayerIcon(submission.prayers.maghrib)}
+                    <span className="text-xs md:text-sm capitalize">Maghrib</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    {getPrayerIcon(submission.prayers.isha)}
+                    <span className="text-xs md:text-sm capitalize">Isha</span>
+                  </div>
                 </div>
 
                 {/* Activities Summary */}
@@ -158,13 +172,39 @@ export function SubmissionTable({ submissions, users }: SubmissionTableProps) {
               <div>
                 <h4 className="font-medium mb-2">Prayer Status</h4>
                 <div className="grid grid-cols-5 gap-2">
-                  {Object.entries(selectedSubmission.prayers).map(([prayer, status]) => (
+                  {/* {Object.entries(selectedSubmission.prayers).map(([prayer, status]) => (
                     <div key={prayer} className="flex flex-col items-center gap-1 p-2 rounded bg-muted/50">
                       {getPrayerIcon(status)}
                       <span className="text-xs capitalize font-medium">{prayer}</span>
                       <span className="text-xs text-muted-foreground capitalize">{status}</span>
                     </div>
-                  ))}
+                  ))} */}
+                  <div className="flex flex-col items-center gap-1 p-2 rounded bg-muted/50">
+                    {getPrayerIcon(selectedSubmission.prayers.fajr)}
+                    <span className="text-xs capitalize font-medium">Fajr</span>
+                    <span className="text-xs text-muted-foreground capitalize">{selectedSubmission.prayers.fajr}</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1 p-2 rounded bg-muted/50">
+                    {getPrayerIcon(selectedSubmission.prayers.zuhr)}
+                    <span className="text-xs capitalize font-medium">Zuhr</span>
+                    <span className="text-xs text-muted-foreground capitalize">{selectedSubmission.prayers.zuhr}</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1 p-2 rounded bg-muted/50">
+                    {getPrayerIcon(selectedSubmission.prayers.asr)}
+                    <span className="text-xs capitalize font-medium">Asr</span>
+                    <span className="text-xs text-muted-foreground capitalize">{selectedSubmission.prayers.asr}</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1 p-2 rounded bg-muted/50">
+                    {getPrayerIcon(selectedSubmission.prayers.maghrib)}
+                    <span className="text-xs capitalize font-medium">Maghrib</span>
+                    <span className="text-xs text-muted-foreground capitalize">{selectedSubmission.prayers.maghrib}</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1 p-2 rounded bg-muted/50">
+                    {getPrayerIcon(selectedSubmission.prayers.isha)}
+                    <span className="text-xs capitalize font-medium">Isha</span>
+                    <span className="text-xs text-muted-foreground capitalize">{selectedSubmission.prayers.isha}</span>
+                  </div>
+
                 </div>
               </div>
 
