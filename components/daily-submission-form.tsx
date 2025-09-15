@@ -157,11 +157,11 @@ export function DailySubmissionForm({ existingSubmission, onClose, onSuccess }: 
 
   const activityNames = {
     tilawat: "তিলাওয়াত (Quran Recitation)",
-    dua: "দোয়া করেছি (Supplication)",
+    dua: "দোয়া করেছি (Dua)",
     sadaqah: "সদাকাহ করেছি (Charity)",
-    dhikr: "জিকির করেছি (Dhikr / Remembrance of Allah)",
-    masnunDua: "মাসনুন দোয়া করেছি (Sunnah Prayers)",
-    bookReading: "বই পড়েছি(নির্ধারিত অংশ) (Read a book - assigned portion)",
+    dhikr: "জিকির করেছি (Dhikr)",
+    masnunDua: "মাসনুন দোয়া করেছি (Masnun Dua)",
+    bookReading: "বই পড়েছি (নির্ধারিত অংশ) (Read a book - assigned portion)",
   }
 
   const getStatusIcon = (status: string) => {
