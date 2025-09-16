@@ -47,7 +47,7 @@ export function PersonalStats({ submissions, loading }: PersonalStatsProps) {
       tilawat: 0,
       dua: 0,
       sadaqah: 0,
-      zikr: 0,
+      dhikr: 0,
       masnunDua: 0,
       bookReading: 0,
     }
@@ -66,7 +66,7 @@ export function PersonalStats({ submissions, loading }: PersonalStatsProps) {
       if (submission.tilawat) activityStats.tilawat++
       if (submission.dua) activityStats.dua++
       if (submission.sadaqah) activityStats.sadaqah++
-      if (submission.zikr) activityStats.zikr++
+      if (submission.dhikr) activityStats.dhikr++
       if (submission.masnunDua) activityStats.masnunDua++
       if (submission.bookReading) activityStats.bookReading++
 
@@ -130,10 +130,10 @@ export function PersonalStats({ submissions, loading }: PersonalStatsProps) {
 
   const activityNames = {
     tilawat: "Quran Recitation",
-    dua: "Supplication",
+    dua: "Dua",
     sadaqah: "Charity",
-    zikr: "Dhikr",
-    masnunDua: "Sunnah Prayers",
+    dhikr : "Dhikr",
+    masnunDua: "Masnun Dua",
     bookReading: "Book Reading",
   }
 
