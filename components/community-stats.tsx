@@ -19,6 +19,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts"
+import { Progress } from "./ui/progress"
 
 interface CommunityStatsProps {
   submissions: DailySubmission[]
@@ -26,6 +27,60 @@ interface CommunityStatsProps {
 }
 
 export function CommunityStats({ submissions, users }: CommunityStatsProps) {
+  const stats = useMemo(() => {
+    if (submissions.length === 0) {
+      return {
+        activityStats: {
+          tilawat: 0,
+          dua: 0,
+          sadaqah: 0,
+          zikr: 0,
+          masnunDua: 0,
+          bookReading: 0,
+        },
+        averageCompletion: 0,
+        totalDays: 0,
+      }
+    }
+
+    const totalDays = submissions.length
+    const activityStats = {
+      tilawat: 0,
+      dua: 0,
+      sadaqah: 0,
+      dhikr: 0,
+      masnunDua: 0,
+      bookReading: 0,
+    }
+
+    let totalCompletion = 0
+
+    submissions.forEach((submission) => {
+
+      // Count activities
+      if (submission.tilawat) activityStats.tilawat++
+      if (submission.dua) activityStats.dua++
+      if (submission.sadaqah) activityStats.sadaqah++
+      if (submission.dhikr) activityStats.dhikr++
+      if (submission.masnunDua) activityStats.masnunDua++
+      if (submission.bookReading) activityStats.bookReading++
+
+      totalCompletion += calculateCompletionRate(submission)
+    })
+
+    Object.keys(activityStats).forEach((activity) => {
+      activityStats[activity as keyof typeof activityStats] = Math.round(
+        (activityStats[activity as keyof typeof activityStats] / totalDays) * 100,
+      )
+    })
+
+    return {
+      activityStats,
+      averageCompletion: Math.round(totalCompletion / totalDays),
+      totalDays,
+    }
+  }, [submissions])
+
   const chartData = useMemo(() => {
     if (submissions.length === 0) return { dailyTrends: [], prayerStats: [], completionDistribution: [] }
 
@@ -114,6 +169,16 @@ export function CommunityStats({ submissions, users }: CommunityStatsProps) {
       </div>
     )
   }
+
+  const activityNames = {
+    tilawat: "Quran Recitation",
+    dua: "Dua",
+    sadaqah: "Charity",
+    dhikr: "Dhikr",
+    masnunDua: "Masnun Dua",
+    bookReading: "Book Reading",
+  }
+
 
   return (
     <div className="space-y-6">
@@ -259,6 +324,27 @@ export function CommunityStats({ submissions, users }: CommunityStatsProps) {
             </ChartContainer>
           </CardContent>
         </Card> */}
+
+      {/* Activity Statistics */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Spiritual Activities</CardTitle>
+          <CardDescription>Percentage of days each activity was completed</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {Object.entries(stats.activityStats).map(([activity, percentage]) => (
+              <div key={activity}>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium">{activityNames[activity as keyof typeof activityNames]}</span>
+                  <span className="text-sm font-bold">{percentage}%</span>
+                </div>
+                <Progress value={percentage} className="h-2" />
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Community Summary Stats */}
       <Card>

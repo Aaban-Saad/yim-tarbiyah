@@ -5,6 +5,8 @@ import { calculateCompletionRate } from "@/lib/firestore"
 import type { DailySubmission } from "@/lib/types"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "./ui/chart"
+import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
 
 interface PersonalStatsProps {
   submissions: DailySubmission[]
@@ -15,13 +17,6 @@ export function PersonalStats({ submissions, loading }: PersonalStatsProps) {
   const stats = useMemo(() => {
     if (submissions.length === 0) {
       return {
-        prayerStats: {
-          fajr: 0,
-          zuhr: 0,
-          asr: 0,
-          maghrib: 0,
-          isha: 0,
-        },
         activityStats: {
           tilawat: 0,
           dua: 0,
@@ -36,13 +31,6 @@ export function PersonalStats({ submissions, loading }: PersonalStatsProps) {
     }
 
     const totalDays = submissions.length
-    const prayerStats = {
-      fajr: 0,
-      zuhr: 0,
-      asr: 0,
-      maghrib: 0,
-      isha: 0,
-    }
     const activityStats = {
       tilawat: 0,
       dua: 0,
@@ -55,12 +43,6 @@ export function PersonalStats({ submissions, loading }: PersonalStatsProps) {
     let totalCompletion = 0
 
     submissions.forEach((submission) => {
-      // Count completed prayers
-      Object.entries(submission.prayers).forEach(([prayer, status]) => {
-        if (status === "completed") {
-          prayerStats[prayer as keyof typeof prayerStats]++
-        }
-      })
 
       // Count activities
       if (submission.tilawat) activityStats.tilawat++
@@ -73,13 +55,6 @@ export function PersonalStats({ submissions, loading }: PersonalStatsProps) {
       totalCompletion += calculateCompletionRate(submission)
     })
 
-    // Convert to percentages
-    Object.keys(prayerStats).forEach((prayer) => {
-      prayerStats[prayer as keyof typeof prayerStats] = Math.round(
-        (prayerStats[prayer as keyof typeof prayerStats] / totalDays) * 100,
-      )
-    })
-
     Object.keys(activityStats).forEach((activity) => {
       activityStats[activity as keyof typeof activityStats] = Math.round(
         (activityStats[activity as keyof typeof activityStats] / totalDays) * 100,
@@ -87,11 +62,78 @@ export function PersonalStats({ submissions, loading }: PersonalStatsProps) {
     })
 
     return {
-      prayerStats,
       activityStats,
       averageCompletion: Math.round(totalCompletion / totalDays),
       totalDays,
     }
+  }, [submissions])
+
+  const chartData = useMemo(() => {
+    if (submissions.length === 0) return { dailyTrends: [], prayerStats: [], completionDistribution: [] }
+
+    // Daily trends - submissions per day
+    const dailySubmissions = submissions.reduce(
+      (acc, submission) => {
+        const date = submission.date
+        if (!acc[date]) {
+          acc[date] = { date, count: 0, avgCompletion: 0, totalCompletion: 0 }
+        }
+        acc[date].count++
+        acc[date].totalCompletion += calculateCompletionRate(submission)
+        acc[date].avgCompletion = Math.round(acc[date].totalCompletion / acc[date].count)
+        return acc
+      },
+      {} as Record<string, { date: string; count: number; avgCompletion: number; totalCompletion: number }>,
+    )
+
+    const dailyTrends = Object.values(dailySubmissions)
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      .slice(-30) // Last 30 days
+
+    // Prayer statistics - completion rates for each prayer
+    const prayerCounts = {
+      fajr: { completed: 0, masbuq: 0, munfarid: 0 },
+      zuhr: { completed: 0, masbuq: 0, munfarid: 0 },
+      asr: { completed: 0, masbuq: 0, munfarid: 0 },
+      maghrib: { completed: 0, masbuq: 0, munfarid: 0 },
+      isha: { completed: 0, masbuq: 0, munfarid: 0 },
+    }
+
+    submissions.forEach((submission) => {
+      Object.entries(submission.prayers).forEach(([prayer, status]) => {
+        // Assert that status is a valid key of the inner object
+        prayerCounts[prayer as keyof typeof prayerCounts][status as 'completed' | 'masbuq' | 'munfarid']++
+      })
+    })
+
+    const prayerStats = Object.entries(prayerCounts).map(([prayer, counts]) => {
+      const total = counts.completed + counts.masbuq + counts.munfarid
+      return {
+        prayer: prayer.charAt(0).toUpperCase() + prayer.slice(1),
+        completed: total ? Math.round((counts.completed / total) * 100) : 0,
+        masbuq: total ? Math.round((counts.masbuq / total) * 100) : 0,
+        munfarid: total ? Math.round((counts.munfarid / total) * 100) : 0,
+      }
+    })
+
+    // Completion rate distribution
+    const completionRanges = { "0-20%": 0, "21-40%": 0, "41-60%": 0, "61-80%": 0, "81-100%": 0 }
+    submissions.forEach((submission) => {
+      const rate = calculateCompletionRate(submission)
+      if (rate <= 20) completionRanges["0-20%"]++
+      else if (rate <= 40) completionRanges["21-40%"]++
+      else if (rate <= 60) completionRanges["41-60%"]++
+      else if (rate <= 80) completionRanges["61-80%"]++
+      else completionRanges["81-100%"]++
+    })
+
+    const completionDistribution = Object.entries(completionRanges).map(([range, count]) => ({
+      range,
+      count,
+      percentage: submissions.length ? Math.round((count / submissions.length) * 100) : 0,
+    }))
+
+    return { dailyTrends, prayerStats, completionDistribution }
   }, [submissions])
 
   if (loading) {
@@ -120,19 +162,11 @@ export function PersonalStats({ submissions, loading }: PersonalStatsProps) {
     )
   }
 
-  const prayerNames = {
-    fajr: "Fajr",
-    zuhr: "Zuhr",
-    asr: "Asr",
-    maghrib: "Maghrib",
-    isha: "Isha",
-  }
-
   const activityNames = {
     tilawat: "Quran Recitation",
     dua: "Dua",
     sadaqah: "Charity",
-    dhikr : "Dhikr",
+    dhikr: "Dhikr",
     masnunDua: "Masnun Dua",
     bookReading: "Book Reading",
   }
@@ -158,24 +192,107 @@ export function PersonalStats({ submissions, loading }: PersonalStatsProps) {
         </CardContent>
       </Card>
 
-      {/* Prayer Statistics */}
+      {/* Daily Activity Trends */}
       <Card>
         <CardHeader>
-          <CardTitle>Prayer Consistency</CardTitle>
-          <CardDescription>Percentage of days each prayer was completed with jamaat</CardDescription>
+          <CardTitle>Daily Activity Trends</CardTitle>
+          <CardDescription>Your submissions and average completion rates over time</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {Object.entries(stats.prayerStats).map(([prayer, percentage]) => (
-              <div key={prayer}>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium">{prayerNames[prayer as keyof typeof prayerNames]}</span>
-                  <span className="text-sm font-bold">{percentage}%</span>
-                </div>
-                <Progress value={percentage} className="h-2" />
-              </div>
-            ))}
-          </div>
+          <ChartContainer
+            config={{
+              count: {
+                label: "Submissions",
+                color: "orange",
+              },
+              avgCompletion: {
+                label: "Avg Completion %",
+                color: "blue",
+              },
+            }}
+            className="h-[300px] w-full"
+          >
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData.dailyTrends}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="date"
+                  tickFormatter={(value) =>
+                    new Date(value).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+                  }
+                />
+                <YAxis yAxisId="left" />
+                <YAxis yAxisId="right" orientation="right" />
+                <ChartTooltip
+                  content={<ChartTooltipContent />}
+                  labelFormatter={(value) =>
+                    new Date(value).toLocaleDateString("en-US", {
+                      weekday: "long",
+                      month: "long",
+                      day: "numeric",
+                    })
+                  }
+                />
+                <Line
+                  yAxisId="left"
+                  type="monotone"
+                  dataKey="count"
+                  stroke="var(--color-count)"
+                  strokeWidth={2}
+                  name="Submissions"
+                />
+                <Line
+                  yAxisId="right"
+                  type="monotone"
+                  dataKey="avgCompletion"
+                  stroke="var(--color-avgCompletion)"
+                  strokeWidth={2}
+                  name="Avg Completion %"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        </CardContent>
+      </Card>
+
+      {/* Prayer Statistics */}
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Prayer Completion Statistics</CardTitle>
+          <CardDescription>Your prayer completion rates by prayer time</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ChartContainer
+            config={{
+              completed: {
+                label: "Completed",
+                color: "green",
+              },
+              masbuq: {
+                label: "Masbuq",
+                color: "orange",
+              },
+              munfarid: {
+                label: "Munfarid",
+                color: "red",
+              },
+            }}
+            className="h-[300px] w-full"
+          >
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData.prayerStats}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="prayer" />
+                <YAxis />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Legend />
+                <Bar dataKey="completed" stackId="a" fill="var(--color-completed)" name="Completed" />
+                <Bar dataKey="masbuq" stackId="a" fill="var(--color-masbuq)" name="Masbuq" />
+                <Bar dataKey="munfarid" stackId="a" fill="var(--color-munfarid)" name="Munfarid" />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartContainer>
         </CardContent>
       </Card>
 
