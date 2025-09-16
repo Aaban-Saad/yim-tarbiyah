@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useAuth } from "@/lib/auth-context"
 import { useTodaySubmission, useUserSubmissions } from "@/lib/hooks/use-submissions"
-import { calculateCompletionRate } from "@/lib/firestore"
+import { calculateCompletionRate, getTodayDate } from "@/lib/firestore"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -12,17 +12,24 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { DailySubmissionForm } from "@/components/daily-submission-form"
 import { PersonalStats } from "@/components/personal-stats"
 import { SubmissionHistory } from "@/components/submission-history"
-import { Calendar, CheckCircle, Clock, TrendingUp, User, LogOut } from "lucide-react"
+import { Calendar, CheckCircle, Clock, TrendingUp, User, LogOut, Filter, Search } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { PastSubmissionForm } from "./past-submission-form"
+import { Label } from "./ui/label"
+import { Input } from "./ui/input"
+import { DailySubmission } from "@/lib/types"
 
 export function UserDashboard() {
   const { user, logout, isAdmin } = useAuth()
   const { submission: todaySubmission, hasSubmittedToday, loading: todayLoading } = useTodaySubmission()
   const { submissions, loading: historyLoading } = useUserSubmissions()
+  const [filteredSubmissions, setFilteredSubmissions] = useState<DailySubmission[]>()
   const [showSubmissionForm, setShowSubmissionForm] = useState(false)
   const [showNewPastSubmissionForm, setShowNewPastSubmissionForm] = useState<boolean>(false)
+  const [selectedStartDate, setSelectedStartDate] = useState("")
+  const [selectedEndDate, setSelectedEndDate] = useState("")
+  const [searchTerm, setSearchTerm] = useState("")
 
   const todayCompletionRate = todaySubmission ? calculateCompletionRate(todaySubmission) : 0
 
@@ -32,6 +39,31 @@ export function UserDashboard() {
     } catch (error) {
       console.error("Error logging out:", error)
     }
+  }
+
+  const handleDateFilter = async (startDate = getTodayDate(), endDate = getTodayDate()) => {
+    setSelectedStartDate(startDate)
+    setSelectedEndDate(endDate)
+    // Convert date strings to Date objects for comparison.
+    // We add one day to the endDate to ensure the filter includes submissions from that day.
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    end.setDate(end.getDate() + 1);
+
+    const filtered = submissions.filter(submission => {
+      // Create a Date object from the submission's date string.
+      const submissionDate = new Date(submission.date);
+
+      // Filter submissions that fall within the specified date range.
+      // The submissionDate must be on or after the start date and before the adjusted end date.
+      return submissionDate >= start && submissionDate < end;
+    });
+
+    setFilteredSubmissions(filtered);
+  };
+
+  const handleShowAll = async () => {
+    setFilteredSubmissions(submissions)
   }
 
   if (todayLoading) {
@@ -212,12 +244,90 @@ export function UserDashboard() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="history">
-            <SubmissionHistory submissions={submissions} loading={historyLoading} />
+          <TabsContent value="history" className="space-y-6">
+            {/* Filters */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Filter Submissions</CardTitle>
+                <CardDescription>Filter and search through your submissions</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col sm:flex-row gap-4">
+
+                  <div className="flex flex-col md:flex-row gap-2">
+                    <div>
+                      <Label htmlFor="date">Start Date</Label>
+                      <Input
+                        id="date"
+                        type="date"
+                        value={selectedStartDate}
+                        onChange={(e) => handleDateFilter(e.target.value, selectedEndDate)}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="date2">End Date</Label>
+                      <Input
+                        id="date2"
+                        type="date"
+                        value={selectedEndDate}
+                        onChange={(e) => handleDateFilter(selectedStartDate, e.target.value)}
+                      />
+                    </div>
+                    <div className="flex items-end">
+                      <Button variant="outline" onClick={handleShowAll}>
+                        <Filter className="h-4 w-4 mr-2" />
+                        Show All
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <SubmissionHistory submissions={filteredSubmissions || submissions} loading={historyLoading} />
           </TabsContent>
 
-          <TabsContent value="stats">
-            <PersonalStats submissions={submissions} loading={historyLoading} />
+          <TabsContent value="stats" className="space-y-6">
+            {/* Filters */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Filter Performance</CardTitle>
+                <CardDescription>View your performance over a specific period.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col sm:flex-row gap-4">
+
+                  <div className="flex flex-col md:flex-row gap-2">
+                    <div>
+                      <Label htmlFor="date">Start Date</Label>
+                      <Input
+                        id="date"
+                        type="date"
+                        value={selectedStartDate}
+                        onChange={(e) => handleDateFilter(e.target.value, selectedEndDate)}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="date2">End Date</Label>
+                      <Input
+                        id="date2"
+                        type="date"
+                        value={selectedEndDate}
+                        onChange={(e) => handleDateFilter(selectedStartDate, e.target.value)}
+                      />
+                    </div>
+                    <div className="flex items-end">
+                      <Button variant="outline" onClick={handleShowAll}>
+                        <Filter className="h-4 w-4 mr-2" />
+                        Show All
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <PersonalStats submissions={filteredSubmissions || submissions} loading={historyLoading} />
           </TabsContent>
         </Tabs>
 

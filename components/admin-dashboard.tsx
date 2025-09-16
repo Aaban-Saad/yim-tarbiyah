@@ -57,7 +57,7 @@ export function AdminDashboard() {
 
   const handleShowAll = async () => {
     try {
-      const allSubmissions = await getAllSubmissions(500)
+      const allSubmissions = await getAllSubmissions(1000)
       setSubmissions(allSubmissions)
       setSelectedStartDate("")
       setSelectedEndDate("")
@@ -257,8 +257,8 @@ export function AdminDashboard() {
             {/* Filters */}
             <Card>
               <CardHeader>
-                <CardTitle>Filter by Date</CardTitle>
-                <CardDescription>Filter and search through community submissions</CardDescription>
+                <CardTitle>Filter Performance</CardTitle>
+                <CardDescription>View community performance over a specific period.</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-col sm:flex-row gap-4">
