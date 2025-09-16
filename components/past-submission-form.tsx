@@ -178,7 +178,7 @@ export function PastSubmissionForm({ existingSubmission, onClose, onSuccess, dat
       case "masbuq":
         return <Clock className="h-4 w-4 text-yellow-600" />
       default:
-        return <XCircle className="h-4 w-4 text-red-600" />
+        return <Hourglass className="h-4 w-4 text-red-600" />
     }
   }
 
