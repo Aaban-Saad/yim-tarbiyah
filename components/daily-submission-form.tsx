@@ -16,6 +16,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle, XCircle, Clock, Save, X, Hourglass } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
+import { getTodayDate } from "@/lib/firestore"
 
 interface DailySubmissionFormProps {
   existingSubmission?: DailySubmission | null
@@ -70,12 +71,12 @@ export function DailySubmissionForm({ existingSubmission, onClose, onSuccess }: 
         bookReading: existingSubmission.bookReading,
       })
       setActivityComments({
-        tilawat: existingSubmission.tilawatComment,
-        dua: existingSubmission.duaComment,
-        sadaqah: existingSubmission.sadaqahComment,
-        dhikr: existingSubmission.dhikrComment,
-        masnunDua: existingSubmission.masnunDuaComment,
-        bookReading: existingSubmission.bookReadingComment,
+        tilawat: existingSubmission.tilawatComment || "",
+        dua: existingSubmission.duaComment || "",
+        sadaqah: existingSubmission.sadaqahComment || "" || "",
+        dhikr: existingSubmission.dhikrComment || "",
+        masnunDua: existingSubmission.masnunDuaComment || "",
+        bookReading: existingSubmission.bookReadingComment || "",
       })
       setSleepTime(existingSubmission.sleepTime)
       setComments(existingSubmission.comments)
@@ -118,13 +119,13 @@ export function DailySubmissionForm({ existingSubmission, onClose, onSuccess }: 
       }
 
       if (existingSubmission) {
-        await update(submissionData, new Date().toISOString().split("T")[0])
+        await update(submissionData, existingSubmission.date)
         toast({
           title: "Updated successfully",
           description: "Your daily amal has been updated.",
         })
       } else {
-        await submit(submissionData, new Date().toISOString().split("T")[0])
+        await submit(submissionData, getTodayDate())
         toast({
           title: "Submitted successfully",
           description: "Your daily amal has been recorded.",

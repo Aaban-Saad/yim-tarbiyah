@@ -84,6 +84,7 @@ export function UserDashboard() {
                   </CardTitle>
                   <CardDescription>
                     {new Date().toLocaleDateString("en-US", {
+                      timeZone: 'Asia/Dhaka',
                       weekday: "long",
                       year: "numeric",
                       month: "long",

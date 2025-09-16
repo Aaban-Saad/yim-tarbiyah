@@ -221,7 +221,7 @@ export function calculateCompletionRate(submission: DailySubmission): number {
     submission.tilawat,
     submission.dua,
     submission.sadaqah,
-    submission.zikr,
+    submission.dhikr,
     submission.masnunDua,
     submission.bookReading,
   ].filter(Boolean).length
@@ -232,10 +232,6 @@ export function calculateCompletionRate(submission: DailySubmission): number {
   return Math.round((completedActivities / totalActivities) * 100)
 }
 
-export function formatDate(date: Date): string {
-  return date.toISOString().split("T")[0]
-}
-
 export function getTodayDate(): string {
-  return formatDate(new Date())
+  return new Date().toLocaleString('en-CA', { timeZone: 'Asia/Dhaka', year: 'numeric', month: '2-digit', day: '2-digit' })
 }

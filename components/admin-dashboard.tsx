@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useAuth } from "@/lib/auth-context"
-import { getAllSubmissions, getAllUsers, getSubmissionsByDate, calculateCompletionRate, getSubmissionsByDateRange } from "@/lib/firestore"
+import { getAllSubmissions, getAllUsers, getSubmissionsByDate, calculateCompletionRate, getSubmissionsByDateRange, getTodayDate } from "@/lib/firestore"
 import type { DailySubmission, UserProfile } from "@/lib/types"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -44,7 +44,7 @@ export function AdminDashboard() {
     fetchData()
   }, [])
 
-  const handleDateFilter = async (startDate = new Date().toISOString().split("T")[0], endDate = new Date().toISOString().split("T")[0]) => {
+  const handleDateFilter = async (startDate = getTodayDate(), endDate = getTodayDate()) => {
     setSelectedStartDate(startDate)
     setSelectedEndDate(endDate)
     try {
@@ -77,7 +77,7 @@ export function AdminDashboard() {
   // Calculate community stats
   const communityStats = {
     totalMembers: users.length,
-    activeToday: submissions.filter((s) => s.date === new Date().toISOString().split("T")[0]).length,
+    activeToday: submissions.filter((s) => s.date === getTodayDate()).length,
     averageCompletion: submissions.length
       ? Math.round(submissions.reduce((acc, sub) => acc + calculateCompletionRate(sub), 0) / submissions.length)
       : 0,
