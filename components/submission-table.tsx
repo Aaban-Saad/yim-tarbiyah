@@ -68,15 +68,15 @@ export function SubmissionTable({ submissions, users }: SubmissionTableProps) {
                         month: "short",
                         day: "numeric",
                       })}
-                      {" • "}
+                      <br />
                       Sleep: {submission.sleepTime}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline">{calculateCompletionRate(submission)}% Complete</Badge>
+                  <div className="flex flex-col  items-end  gap-2">
                     <Button variant="ghost" size="sm" onClick={() => setSelectedSubmission(submission)}>
                       <Eye className="h-4 w-4" />
                     </Button>
+                    <Badge variant="outline">{calculateCompletionRate(submission)}% Complete</Badge>
                   </div>
                 </div>
 

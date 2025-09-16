@@ -31,7 +31,7 @@ export function AdminDashboard() {
     const fetchData = async () => {
       try {
         setLoading(true)
-        const [allSubmissions, allUsers] = await Promise.all([getAllSubmissions(200), getAllUsers()])
+        const [allSubmissions, allUsers] = await Promise.all([getAllSubmissions(1000), getAllUsers()])
         setSubmissions(allSubmissions)
         setUsers(allUsers)
       } catch (error) {
@@ -91,6 +91,13 @@ export function AdminDashboard() {
       user?.displayName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       submission.comments?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  })
+
+  const filteredUsers = users.filter((user) => {
+    return (
+      user?.displayName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user?.email?.toLowerCase().includes(searchTerm.toLowerCase())
     )
   })
 
@@ -228,7 +235,7 @@ export function AdminDashboard() {
                         id="date2"
                         type="date"
                         value={selectedEndDate}
-                        onChange={(e) => handleDateFilter(selectedStartDate, e.target.value)} 
+                        onChange={(e) => handleDateFilter(selectedStartDate, e.target.value)}
                       />
                     </div>
                     <div className="flex items-end">
@@ -246,12 +253,99 @@ export function AdminDashboard() {
             <SubmissionTable submissions={filteredSubmissions} users={users} />
           </TabsContent>
 
-          <TabsContent value="analytics">
+          <TabsContent value="analytics" className="space-y-6">
+            {/* Filters */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Filter by Date</CardTitle>
+                <CardDescription>Filter and search through community submissions</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex flex-col md:flex-row gap-2">
+                    <div>
+                      <Label htmlFor="date">Start Date</Label>
+                      <Input
+                        id="date"
+                        type="date"
+                        value={selectedStartDate}
+                        onChange={(e) => handleDateFilter(e.target.value, selectedEndDate)}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="date2">End Date</Label>
+                      <Input
+                        id="date2"
+                        type="date"
+                        value={selectedEndDate}
+                        onChange={(e) => handleDateFilter(selectedStartDate, e.target.value)}
+                      />
+                    </div>
+                    <div className="flex items-end">
+                      <Button variant="outline" onClick={handleShowAll}>
+                        <Filter className="h-4 w-4 mr-2" />
+                        Show All
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
             <CommunityStats submissions={submissions} users={users} />
           </TabsContent>
 
-          <TabsContent value="users">
-            <UserManagement users={users} submissions={submissions} />
+          <TabsContent value="users" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Filter Users</CardTitle>
+                <CardDescription>Filter and search users</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex-1">
+                    <Label htmlFor="search">Search by user name or email</Label>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="search"
+                        placeholder="Search users..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex flex-col md:flex-row gap-2">
+                    <div>
+                      <Label htmlFor="date">Start Date</Label>
+                      <Input
+                        id="date"
+                        type="date"
+                        value={selectedStartDate}
+                        onChange={(e) => handleDateFilter(e.target.value, selectedEndDate)}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="date2">End Date</Label>
+                      <Input
+                        id="date2"
+                        type="date"
+                        value={selectedEndDate}
+                        onChange={(e) => handleDateFilter(selectedStartDate, e.target.value)}
+                      />
+                    </div>
+                    <div className="flex items-end">
+                      <Button variant="outline" onClick={handleShowAll}>
+                        <Filter className="h-4 w-4 mr-2" />
+                        Show All
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <UserManagement users={filteredUsers} submissions={submissions} />
           </TabsContent>
 
           <TabsContent value="admin" className="space-y-6">
