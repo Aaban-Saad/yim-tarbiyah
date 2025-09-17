@@ -118,6 +118,7 @@ export function PastSubmissionForm({ existingSubmission, onClose, onSuccess, dat
         dhikrComment: activityComments.dhikr,
         masnunDuaComment: activityComments.masnunDua,
         bookReadingComment: activityComments.bookReading,
+        date: selectedDate,
         sleepTime,
         comments,
       }
@@ -125,7 +126,7 @@ export function PastSubmissionForm({ existingSubmission, onClose, onSuccess, dat
       console.log(submissionData)
 
       if (existingSubmission) {
-        await update(submissionData, selectedDate)
+        await update(submissionData, existingSubmission.date)
         toast({
           title: "Updated successfully",
           description: "Your daily amal has been updated.",
@@ -204,22 +205,16 @@ export function PastSubmissionForm({ existingSubmission, onClose, onSuccess, dat
             {existingSubmission ? "Edit Amal" : "Submit Amal"}
           </DialogTitle>
           <DialogDescription className="text-start">
-            {newEntry ?
-              <Input
-                type="date"
-                value={selectedDate}
-                onChange={(e) => {
-                  setSelectedDate(e.target.value)
-                }}
-              />
-              :
-              (new Date(existingSubmission?.date || "").toLocaleDateString("en-US", {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              }))
-            }
+
+            <Input
+              type="date"
+              value={selectedDate}
+              placeholder="Select Date"
+              onChange={(e) => {
+                setSelectedDate(e.target.value)
+              }}
+            />
+            
           </DialogDescription>
         </DialogHeader>
 

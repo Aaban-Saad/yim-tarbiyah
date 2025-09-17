@@ -83,7 +83,7 @@ export function UserManagement({ users, submissions }: UserManagementProps) {
                   <div className="flex items-center gap-2">
                     {user.isAdmin && <Badge variant="secondary">Admin</Badge>}
                     <Badge variant="outline">
-                      Joined {new Date(user.joinedAt).toLocaleDateString("en-US", { month: "short", year: "numeric" })}
+                      Joined {new Date(user.joinedAt).toLocaleDateString("en-US", { month: "short", day:"2-digit", year: "numeric" })}
                     </Badge>
                   </div>
                 </div>
